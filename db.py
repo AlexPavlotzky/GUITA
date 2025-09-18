@@ -45,7 +45,6 @@ def get_account_balances():
             SUM(
                 CASE 
                     WHEN I.DO_TYPE IN (0, 4)
-                        AND NOT (I.DO_TYPE = 4 AND A.NIC_NAME = 'Debiti')
                         THEN CAST(I.ZMONEY AS REAL)
                     WHEN I.DO_TYPE IN (1, 3) 
                         THEN -CAST(I.ZMONEY AS REAL)
@@ -54,7 +53,6 @@ def get_account_balances():
             ) AS balance
         FROM ASSETS A
         LEFT JOIN INOUTCOME I ON A.uid = I.assetUid
-        WHERE I.IS_DEL IS NULL OR I.IS_DEL = 0
         GROUP BY A.uid;
     """)
     rows = cur.fetchall()
@@ -78,7 +76,7 @@ def insert_transaction(date_uid, amount_uid, desc_uid, tipo, category_uid, accou
         cur.execute("""
             INSERT INTO INOUTCOME (ZDATE, ZMONEY, ZCONTENT, ctgUid, assetUid, toAssetUid, DO_TYPE, uid)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (ts, str(-abs(amount_uid)), desc_uid, None, account_uid, to_account_uid, 3, str(uuid.uuid4())))
+        """, (ts, str(abs(amount_uid)), desc_uid, None, account_uid, to_account_uid, 3, str(uuid.uuid4())))
         # Entrada
         cur.execute("""
             INSERT INTO INOUTCOME (ZDATE, ZMONEY, ZCONTENT, ctgUid, assetUid, DO_TYPE, uid)
@@ -104,9 +102,10 @@ def get_transactions(limit=None):
     FROM INOUTCOME I
     LEFT JOIN ZCATEGORY C ON I.ctgUid = C.uid
     LEFT JOIN ASSETS A ON I.assetUid = A.uid
-    WHERE I.IS_DEL IS NULL OR I.IS_DEL != 1
+    
     ORDER BY I.ZDATE DESC
     """
+    # WHERE I.IS_DEL IS NULL OR I.IS_DEL != 1
     if limit:
         query += " LIMIT ?"
         cur.execute(query, (limit,))

@@ -450,6 +450,7 @@ class AccountsView(Gtk.Box):
     def load_accounts(self):
         self.store.clear()
         balances = db.get_account_balances()
+        
         for name, balance in balances:
             try:
                 amount = float(balance)
@@ -532,7 +533,7 @@ class GuitaApp(Gtk.Application):
     
         window.set_child(vbox)
         window.present()
-        
+
     def on_delete_transaction(self, action, param):
         selection = self.transactions_view.view.get_selection()
         model, treeiter = selection.get_selected()
