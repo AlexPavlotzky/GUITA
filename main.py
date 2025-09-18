@@ -100,9 +100,9 @@ class TransactionsView(Gtk.Box):
         # Scroll con tabla
         scroll = Gtk.ScrolledWindow()
         scroll.set_child(self.view)
-        scroll.set_vexpand(True)           # que intente expandirse
-        scroll.set_min_content_height(200) # altura mínima de la tabla
-        scroll.set_max_content_height(400) # altura máxima de la tabla
+        scroll.set_vexpand(True)
+        scroll.set_min_content_height(200)
+        scroll.set_max_content_height(400)
         box_table.append(scroll)
          
         # Botón + en la parte inferior
@@ -124,6 +124,7 @@ class TransactionsView(Gtk.Box):
         
         # Ganancia
         income_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        income_box.set_margin_top(20)
 
         income_box.append(Gtk.Label(label="Fecha:"))
         self.income_entry_date = Gtk.Entry()
@@ -157,6 +158,7 @@ class TransactionsView(Gtk.Box):
 
         # Gasto
         expense_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        expense_box.set_margin_top(20)
         
         expense_box.append(Gtk.Label(label="Fecha:"))
         self.expense_entry_date = Gtk.Entry()
@@ -190,7 +192,8 @@ class TransactionsView(Gtk.Box):
 
         # Transferencia
         transfer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-
+        transfer_box.set_margin_top(20)
+        
         transfer_box.append(Gtk.Label(label="Fecha:"))
         self.transfer_entry_date = Gtk.Entry()
         self.transfer_entry_date.set_text(datetime.now().strftime("%Y-%m-%d"))
@@ -220,7 +223,6 @@ class TransactionsView(Gtk.Box):
         
         self.form_stack.add_named(transfer_box, "transfer")
 
-        # Botones tipo arriba
         type_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self.btn_income = Gtk.Button(label="Ganancia")
         self.btn_income.connect("clicked", lambda b: self.form_stack.set_visible_child_name("income"))
@@ -231,6 +233,8 @@ class TransactionsView(Gtk.Box):
         type_box.append(self.btn_income)
         type_box.append(self.btn_expense)
         type_box.append(self.btn_transfer)
+        type_box.set_margin_top(50)
+        type_box.set_halign(Gtk.Align.CENTER)
 
         # Botones aceptar/cancelar
         button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
@@ -240,6 +244,8 @@ class TransactionsView(Gtk.Box):
         cancel_btn.connect("clicked", self.on_cancel)
         button_box.append(accept_btn)
         button_box.append(cancel_btn)
+        button_box.set_margin_top(20)
+        button_box.set_halign(Gtk.Align.CENTER)
 
         form_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         form_main.append(type_box)
@@ -308,7 +314,7 @@ class TransactionsView(Gtk.Box):
         self.store.clear()
         income_total = 0.0
         expense_total = 0.0
-        saving_total = 0.0      # Ahorros
+        saving_total = 0.0
         debt_last_month = 0.0
         debt_total = 0.0
         all_tx = db.get_transactions(limit=None)
@@ -326,13 +332,13 @@ class TransactionsView(Gtk.Box):
 
                 # --- Mostrar transacciones del mes actual ---
                 self.store.append((
-                    uid, # uid 
-                    tx[1], # fecha
-                    formatted_amount, # monto 
-                    tx[3], # tipo 
-                    tx[4], # categoría 
-                    tx[5], # descripción 
-                    tx[6] # cuenta 
+                    uid,
+                    tx[1],
+                    formatted_amount,
+                    tx[3],
+                    tx[4], 
+                    tx[5],
+                    tx[6] 
                     )) 
 
                 # --- Calcular resumen del mes: Ganancia, Gasto y Deuda --- 
@@ -409,6 +415,7 @@ class AccountsView(Gtk.Box):
         view = Gtk.TreeView(model=self.store)
         view.set_vexpand(True)
         view.set_halign(Gtk.Align.CENTER)
+        view.set_margin_top(50)
 
         columns = ["Cuenta", "Saldo"]
         for i, title in enumerate(columns):
@@ -430,17 +437,12 @@ class AccountsView(Gtk.Box):
 
         
         box_table = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-
-        separator1 = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        separator1.set_margin_top(5)
-        separator1.set_margin_bottom(5)
-        box_table.append(separator1)
         
         scroll = Gtk.ScrolledWindow()
         scroll.set_child(view)
-        scroll.set_vexpand(True)           # que intente expandirse
-        scroll.set_min_content_height(200) # altura mínima de la tabla
-        scroll.set_max_content_height(400) # altura máxima de la tabla
+        scroll.set_vexpand(True)
+        scroll.set_min_content_height(200)
+        scroll.set_max_content_height(400)
         box_table.append(scroll)
 
         self.append(box_table)
@@ -553,7 +555,7 @@ class GuitaApp(Gtk.Application):
         selection = self.transactions_view.view.get_selection()
         model, treeiter = selection.get_selected()
         if treeiter:
-            uid = model[treeiter][0]   # primera columna = uid
+            uid = model[treeiter][0]
             date = model[treeiter][1]
             desc = model[treeiter][2]
 
